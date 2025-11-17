@@ -1,5 +1,6 @@
 # Changelog:
 # AWS-13 - Initial EC2 VPC outputs configuration - 2025-01-27
+# AWS-13 - Removed SSH access configuration - 2025-01-27
 
 output "vpc_id" {
   description = "ID of the VPC"
@@ -41,7 +42,7 @@ output "instance_public_dns" {
   value       = aws_instance.main.public_dns
 }
 
-output "ssh_connection_command" {
-  description = "SSH command to connect to the instance"
-  value       = "ssh -i ~/.ssh/${var.key_name}.pem ec2-user@${aws_instance.main.public_ip}"
+output "instance_access_note" {
+  description = "Note about instance access"
+  value       = "Instance has no SSH key configured. Use AWS Systems Manager Session Manager for access."
 }

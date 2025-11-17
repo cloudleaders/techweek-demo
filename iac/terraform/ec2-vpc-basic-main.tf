@@ -91,14 +91,6 @@ resource "aws_security_group" "ec2_sg" {
   name_prefix = "${var.project_name}-ec2-sg"
   vpc_id      = aws_vpc.main.id
 
-  ingress {
-    description = "SSH"
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = [var.allowed_ssh_cidr]
-  }
-
   egress {
     description = "All outbound traffic"
     from_port   = 0
@@ -159,24 +151,18 @@ resource "aws_iam_role_policy_attachment" "cloudwatch_agent" {
   policy_arn = "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
 }
 
-# Key Pair (reference existing or create new)
-resource "aws_key_pair" "ec2_key" {
-  key_name   = var.key_name
-  public_key = file("~/.ssh/id_rsa.pub") # Update path as needed
-
-  tags = {
-    Name        = "${var.project_name}-key-pair"
-    Environment = var.environment
-    JiraId      = "AWS-13"
-    ManagedBy   = "terraform"
-  }
+# Attach Systems Manager policy for instance access
+resource "aws_iam_role_policy_attachment" "ssm_managed_instance" {
+  role       = aws_iam_role.ec2_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }
+
+
 
 # EC2 Instance
 resource "aws_instance" "main" {
   ami                    = data.aws_ami.amazon_linux.id
   instance_type          = var.instance_type
-  key_name               = aws_key_pair.ec2_key.key_name
   vpc_security_group_ids = [aws_security_group.ec2_sg.id]
   subnet_id              = aws_subnet.public.id
   iam_instance_profile   = aws_iam_instance_profile.ec2_profile.name

@@ -19,14 +19,3 @@ variable "instance_type" {
   default     = "t3.micro"
 }
 
-variable "key_name" {
-  description = "Name of the AWS key pair for SSH access"
-  type        = string
-  default     = "ec2-key-pair"
-}
-
-variable "allowed_ssh_cidr" {
-  description = "CIDR block allowed for SSH access"
-  type        = string
-  default     = "0.0.0.0/0"
-}
