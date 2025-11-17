@@ -32,7 +32,7 @@
          cloud {
            organization = "aws-devops-ai"
            workspaces {
-             name = "ws-terraform"
+             name = "aws-cloudleader-demo"
            }
          }
        }
