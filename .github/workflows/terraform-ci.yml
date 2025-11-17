@@ -12,7 +12,6 @@ on:
       - "iac/terraform/**"
       - ".github/workflows/terraform-ci.yml"
 
-
 permissions:
   contents: read
   security-events: write

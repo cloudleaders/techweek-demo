@@ -79,7 +79,7 @@ Render GitHub Actions workflow files (YAML) matched to detected code environment
 - Python CD Workflows (if deployment is applicable):
   - Files: `python-deploy-dev.yml`, `python-deploy-test.yml`, `python-deploy-prod.yml`
   - **Branch Trigger Requirements (Mandatory):**
-    - `deploy-dev` workflow MUST only trigger when the triggering CI workflow ran on the `develop` branch. Add `branches: [develop]` to the `workflow_run` trigger
+    - `deploy-dev` workflow MUST only trigger when the triggering CI workflow ran on the `main` branch. Add `branches: [main]` to the `workflow_run` trigger
     - `deploy-test` workflow MUST only trigger when the triggering dev deployment workflow ran on the `main` branch. Add `branches: [main]` to the `workflow_run` trigger
     - `deploy-prod` workflow MUST only trigger when the triggering test deployment workflow ran on the `main` branch. Add `branches: [main]` to the `workflow_run` trigger
   - Triggers:
@@ -92,7 +92,7 @@ Render GitHub Actions workflow files (YAML) matched to detected code environment
       workflow_run:
         workflows: ["Python CI"]
         types: [completed]
-        branches: [develop]
+        branches: [main]
     ```
   - Example `workflow_run` trigger with branch filter for test/prod:
     ```yaml
@@ -191,7 +191,7 @@ Render GitHub Actions workflow files (YAML) matched to detected code environment
 
   - Files: `terraform-deploy-dev.yml`, `terraform-deploy-test.yml`, `terraform-deploy-prod.yml`
   - **Branch Trigger Requirements (Mandatory):**
-    - `terraform-deploy-dev.yml` MUST only trigger when the triggering CI workflow ran on the `develop` branch. Add `branches: [develop]` to the `workflow_run` trigger. Code checkout MUST happen only from `develop` branch to deploy. 
+    - `terraform-deploy-dev.yml` MUST only trigger when the triggering CI workflow ran on the `main` branch. Add `branches: [main]` to the `workflow_run` trigger. Code checkout MUST happen only from `main` branch to deploy. 
     - `terraform-deploy-test.yml` MUST only trigger when the triggering dev deployment workflow ran on the `main` branch. Add `branches: [main]` to the `workflow_run` trigger
     - `terraform-deploy-prod.yml` MUST only trigger when the triggering test deployment workflow ran on the `main` branch. Add `branches: [main]` to the `workflow_run` trigger
   - Common conventions:
@@ -204,7 +204,7 @@ Render GitHub Actions workflow files (YAML) matched to detected code environment
         workflow_run:
           workflows: ["Terraform CI"]
           types: [completed]
-          branches: [develop]
+          branches: [main]
       ```
     - Example `workflow_run` trigger with branch filter for test/prod:
       ```yaml
