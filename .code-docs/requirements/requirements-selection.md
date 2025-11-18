@@ -2,19 +2,23 @@
 
 ## Available Requirements for Implementation
 
-Please select a requirement by entering the number (1) or the ticket key (AWS-13):
+**Select a requirement by number:**
 
 ### 1. AWS-13 - Create an EC2 instance in a VPC
-- **Status**: ✅ Approved | **Type**: Infrastructure | **Complexity**: Basic
+- **Type**: Infrastructure (EC2, VPC)
 - **Services**: EC2, VPC, Security Groups, CloudWatch
-- **Description**: Deploy a single Amazon EC2 instance within a VPC to demonstrate basic AWS compute and networking infrastructure setup
-- **Implementation**: Terraform Infrastructure as Code
-- **File**: .jira-docs/requirements/AWS-13_requirements.md
+- **Complexity**: Basic
+- **Status**: ✅ Already Implemented
+- **Note**: Code already exists in project
+
+### 2. AWS-14 - S3 bucket + Lambda function trigger
+- **Type**: Serverless (S3, Lambda)
+- **Services**: S3, Lambda, IAM, CloudWatch
+- **Complexity**: Medium
+- **Status**: 🆕 Ready for Implementation
+- **Description**: Event-driven serverless architecture where file uploads to S3 trigger Lambda function
 
 ## Selection Instructions
-
-Enter your choice as:
-- **Number**: 1
-- **Ticket Key**: AWS-13
-
-**Which requirement would you like to implement?**
+- Enter the number (1 or 2) to select requirements
+- AWS-13 is already implemented
+- AWS-14 is ready for new implementation
