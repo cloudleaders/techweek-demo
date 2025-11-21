@@ -35,6 +35,11 @@ MANIFEST
 *.pem
 *.key
 
+# Lambda deployment packages
+*.zip
+lambda_function.zip
+lambda-*.zip
+
 # IDE
 .vscode/
 .idea/

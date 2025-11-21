@@ -2,23 +2,22 @@
 
 ## Available Requirements for Implementation
 
-**Select a requirement by number:**
+Please select a requirement by number or ticket key:
 
 ### 1. AWS-13 - Create an EC2 instance in a VPC
+- **Status**: Approved
 - **Type**: Infrastructure (EC2, VPC)
 - **Services**: EC2, VPC, Security Groups, CloudWatch
 - **Complexity**: Basic
-- **Status**: ✅ Already Implemented
-- **Note**: Code already exists in project
+- **Description**: Deploy a single Amazon EC2 instance within a Virtual Private Cloud (VPC) to demonstrate basic AWS compute and networking infrastructure setup.
 
-### 2. AWS-14 - S3 bucket + Lambda function trigger
+### 2. AWS-14 - Create S3 bucket and Lambda function with file upload trigger
+- **Status**: Approved  
 - **Type**: Serverless (S3, Lambda)
 - **Services**: S3, Lambda, IAM, CloudWatch
 - **Complexity**: Medium
-- **Status**: 🆕 Ready for Implementation
-- **Description**: Event-driven serverless architecture where file uploads to S3 trigger Lambda function
+- **Description**: Create an event-driven serverless architecture where file uploads to an S3 bucket automatically trigger a Lambda function for processing.
 
 ## Selection Instructions
-- Enter the number (1 or 2) to select requirements
-- AWS-13 is already implemented
-- AWS-14 is ready for new implementation
+- Enter the number (1 or 2) or ticket key (AWS-13 or AWS-14) to select your requirement
+- Only one requirement can be implemented at a time

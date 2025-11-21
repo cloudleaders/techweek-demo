@@ -14,7 +14,7 @@
 - **Status**: Complete
 - **Start Time**: 2025-01-27T15:45:00Z
 - **End Time**: 2025-01-27T15:45:45Z
-- **Selected Requirements**: AWS-14 - create a s3 bucket and a demo lambda function whenever I upload file the lambda function should trigger
+- **Selected Requirements**: AWS-14 - REMOVED - Infrastructure destroyed via CI/CD pipeline
 - **Requirements Found**: 2
 
 ### Phase 2: Generate Code
