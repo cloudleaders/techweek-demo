@@ -1,0 +1,30 @@
+{
+  "project": "s3-lambda-trigger",
+  "jira_ticket": "AWS-14",
+  "artifacts": [
+    {
+      "artifact_name": "lambda-package",
+      "artifact_type": "lambda_deployment_package",
+      "source_path": "src/lambda-python-s3-lambda-trigger/",
+      "artifact_destination_path": "iac/terraform/lambda_function.zip",
+      "terraform_resource": "aws_lambda_function.s3_processor",
+      "description": "Lambda deployment package for S3 event processing"
+    }
+  ],
+  "lambda_functions": [
+    {
+      "function_name": "s3-processor",
+      "runtime": "python3.12",
+      "handler": "lambda_handler.lambda_handler",
+      "source_dir": "src/lambda-python-s3-lambda-trigger/",
+      "terraform_resource": "aws_lambda_function.s3_processor"
+    }
+  ],
+  "s3_buckets": [
+    {
+      "bucket_purpose": "upload_bucket",
+      "terraform_resource": "aws_s3_bucket.upload_bucket",
+      "triggers": ["aws_lambda_function.s3_processor"]
+    }
+  ]
+}

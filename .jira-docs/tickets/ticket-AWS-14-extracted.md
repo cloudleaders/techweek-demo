@@ -1,42 +1,33 @@
-# AWS-14 Extracted Information
+# AWS-14 - Extracted Key Information
 
-## Key Information
-- **Ticket Key**: AWS-14
-- **Title**: create a s3 bucket and a demo lambda function whenever I upload file the lambda function should trigger
-- **Type**: Story
-- **Complexity**: Medium
+## Ticket Summary
+**AWS-14**: create a s3 bucket and a demo lambda function whenever I upload file the lambda function should trigger
 
-## Technical Scope
-- **AWS Services**: S3, Lambda, IAM
-- **Architecture Pattern**: Event-driven serverless
-- **Trigger Mechanism**: S3 object creation events
-- **Processing Component**: Lambda function
+## Key Requirements
+- Create an S3 bucket
+- Create a demo Lambda function  
+- Configure S3 to trigger Lambda function when files are uploaded
+- Event-driven architecture (S3 → Lambda)
 
-## Implementation Requirements
-1. **S3 Bucket Creation**
-   - Standard storage class
-   - Event notification configuration
-   - Proper bucket policies
+## Technical Components
+- **AWS S3**: Storage bucket for file uploads
+- **AWS Lambda**: Serverless function for processing
+- **S3 Event Notifications**: Trigger mechanism
 
-2. **Lambda Function**
-   - Runtime: Python 3.x
-   - S3 event processing logic
-   - Error handling and logging
+## Acceptance Criteria (Inferred)
+- S3 bucket is created and accessible
+- Lambda function is deployed and functional
+- File upload to S3 automatically triggers Lambda execution
+- Lambda function processes the upload event successfully
 
-3. **IAM Configuration**
-   - Lambda execution role
-   - S3 bucket permissions
-   - CloudWatch logging permissions
+## Project Context
+- **Project**: aws-project-sample
+- **Type**: Story (user-facing functionality)
+- **Priority**: Medium
+- **Status**: To Do (ready for implementation)
 
-4. **Event Integration**
-   - S3 event notification to Lambda
-   - Event filtering (if needed)
-   - Dead letter queue (optional)
-
-## Dependencies
-- None identified
-
-## Risks
-- Lambda cold start latency
-- S3 event delivery guarantees
-- IAM permission complexity
+## Implementation Notes
+- Simple event-driven serverless architecture
+- Demonstrates basic AWS integration pattern
+- No specific file processing requirements mentioned
+- Demo/proof-of-concept scope

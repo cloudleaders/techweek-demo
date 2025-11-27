@@ -1,48 +1,56 @@
-# AWS-14 Requirements Analysis
+# AWS-14 Technical Analysis
 
-## Technical Analysis
+## Selected Requirement
+**AWS-14**: S3 bucket and Lambda function with event trigger
 
-### AWS Services to Implement
-- **S3**: File storage bucket with event notifications
-- **Lambda**: Python function for file processing
-- **IAM**: Execution roles and policies
-- **CloudWatch**: Logging and monitoring
+## Technical Decisions
 
-### Programming Language Requirements
-- **Primary**: Python 3.x for Lambda function
-- **Infrastructure**: Terraform HCL
+### Infrastructure as Code Tool
+**Selected**: Terraform
+**Reasoning**: 
+- Industry standard for AWS infrastructure
+- Declarative configuration
+- State management for infrastructure changes
+- Excellent AWS provider support
 
-### Infrastructure Requirements
-- **Terraform Configuration**: S3, Lambda, IAM resources
-- **Lambda Runtime**: Python 3.11 or 3.12
-- **Memory**: 128-256 MB
-- **Timeout**: 30 seconds
+### Runtime/Language
+**Selected**: Python 3.12 (Lambda)
+**Reasoning**:
+- Specified in requirements
+- Excellent AWS SDK support
+- Simple for demo purposes
+- Fast cold start times
 
-### Feature Name Generation
-- **Generated Feature Name**: `file-processor`
-- **Based on**: S3 file upload triggering Lambda processing
+### Feature Name
+**Generated**: s3-lambda-trigger
 
-### Code Structure Planning
-```
-iac/terraform/
-├── file-processor-main.tf      # S3, Lambda, IAM resources
-├── file-processor-variables.tf # Input variables
-├── file-processor-outputs.tf   # Output values
-└── file-processor-local.tf     # Local values and data sources
+### Resource Tags
+- **JiraId**: AWS-14
+- **ManagedBy**: terraform
+- **Environment**: dev
+- **Project**: aws-project-sample
 
-src/lambda-file-processor/
-├── lambda_handler.py           # Main Lambda function
-├── requirements.txt            # Python dependencies
-└── utils/                      # Utility functions
+## Architecture Components
 
-tests/file-processor/
-├── test_lambda_handler.py      # Unit tests
-└── test_integration.py         # Integration tests
-```
+### Infrastructure (Terraform)
+- S3 bucket with event notifications
+- Lambda function with execution role
+- IAM role and policies (least privilege)
+- CloudWatch log group
 
-### Implementation Priority
-1. **High**: S3 bucket with event configuration
-2. **High**: Lambda function with S3 trigger
-3. **High**: IAM roles and policies
-4. **Medium**: CloudWatch logging
-5. **Low**: Unit tests and validation
+### Application Code (Python)
+- Lambda handler function
+- S3 event processing logic
+- CloudWatch logging
+- Error handling
+
+### Integration
+- S3 event notification → Lambda trigger
+- Lambda → CloudWatch logs
+- IAM permissions for S3 read access
+
+## Implementation Scope
+- **IaC**: Terraform configuration for all AWS resources
+- **Application**: Python Lambda function
+- **Testing**: Basic unit tests for Lambda function
+- **Documentation**: Deployment and usage instructions

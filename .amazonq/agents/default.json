@@ -2,13 +2,20 @@
   "name": "q_ide_default",
   "description": "Default agent configuration",
   "prompt": "",
-  "mcpServers": {},
+  "mcpServers": {
+    "atlassian-mcp-server": {
+      "url": "https://mcp.atlassian.com/v1/sse",
+      "disabled": false,
+      "timeout": 60000
+    }
+  },
   "tools": [
     "fs_read",
     "execute_bash",
     "fs_write",
     "report_issue",
-    "use_aws"
+    "use_aws",
+    "@atlassian-mcp-server"
   ],
   "toolAliases": {},
   "allowedTools": [
@@ -16,7 +23,40 @@
     "report_issue",
     "use_aws",
     "execute_bash",
-    "fs_write"
+    "fs_write",
+    "@atlassian-mcp-server/atlassianUserInfo",
+    "@atlassian-mcp-server/getAccessibleAtlassianResources",
+    "@atlassian-mcp-server/getConfluenceSpaces",
+    "@atlassian-mcp-server/getConfluencePage",
+    "@atlassian-mcp-server/getPagesInConfluenceSpace",
+    "@atlassian-mcp-server/getConfluencePageFooterComments",
+    "@atlassian-mcp-server/getConfluencePageInlineComments",
+    "@atlassian-mcp-server/getConfluencePageDescendants",
+    "@atlassian-mcp-server/createConfluencePage",
+    "@atlassian-mcp-server/updateConfluencePage",
+    "@atlassian-mcp-server/createConfluenceFooterComment",
+    "@atlassian-mcp-server/createConfluenceInlineComment",
+    "@atlassian-mcp-server/searchConfluenceUsingCql",
+    "@atlassian-mcp-server/getJiraIssue",
+    "@atlassian-mcp-server/editJiraIssue",
+    "@atlassian-mcp-server/createJiraIssue",
+    "@atlassian-mcp-server/getTransitionsForJiraIssue",
+    "@atlassian-mcp-server/transitionJiraIssue",
+    "@atlassian-mcp-server/lookupJiraAccountId",
+    "@atlassian-mcp-server/searchJiraIssuesUsingJql",
+    "@atlassian-mcp-server/addCommentToJiraIssue",
+    "@atlassian-mcp-server/getJiraIssueRemoteIssueLinks",
+    "@atlassian-mcp-server/getVisibleJiraProjects",
+    "@atlassian-mcp-server/getJiraProjectIssueTypesMetadata",
+    "@atlassian-mcp-server/getJiraIssueTypeMetaWithFields",
+    "@atlassian-mcp-server/getCompassComponents",
+    "@atlassian-mcp-server/getCompassComponent",
+    "@atlassian-mcp-server/getCompassCustomFieldDefinitions",
+    "@atlassian-mcp-server/createCompassCustomFieldDefinition",
+    "@atlassian-mcp-server/createCompassComponent",
+    "@atlassian-mcp-server/createCompassComponentRelationship",
+    "@atlassian-mcp-server/search",
+    "@atlassian-mcp-server/fetch"
   ],
   "toolsSettings": {
     "use_aws": {
