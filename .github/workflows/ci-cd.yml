@@ -199,20 +199,41 @@ jobs:
         with:
           python-version: '3.12'
           cache: 'pip'
-      - name: Install Python dependencies
+      - name: Install Python dependencies (S3 Lambda)
         working-directory: src/lambda-python-s3-lambda-trigger
         run: |
           if [ -f requirements.txt ] && [ -s requirements.txt ]; then
             pip install -r requirements.txt
           fi
-      - name: Build Lambda package for Terraform
+      - name: Install Python dependencies (DynamoDB SQS Lambda)
+        working-directory: src/lambda-python-dynamodb-sqs-lambda
+        run: |
+          if [ -f requirements.txt ] && [ -s requirements.txt ]; then
+            pip install -r requirements.txt
+          fi
+      - name: Build S3 Lambda package for Terraform
         run: |
           mkdir -p ./iac/terraform
           cd src/lambda-python-s3-lambda-trigger
           zip -r ../../iac/terraform/lambda_function.zip . -x "*.git*" "*.md" "tests/*" "*.tf*" "iac/**"
           cd ../..
-          echo "✓ Lambda package built at: ./iac/terraform/lambda_function.zip"
+          echo "✓ S3 Lambda package built at: ./iac/terraform/lambda_function.zip"
           ls -lh ./iac/terraform/lambda_function.zip
+      - name: Build DynamoDB SQS Lambda packages for Terraform
+        run: |
+          mkdir -p ./iac/terraform
+          # Build main Lambda package (lambda_handler.py)
+          cd src/lambda-python-dynamodb-sqs-lambda
+          zip -r ../../iac/terraform/lambda_function.zip lambda_handler.py requirements.txt -x "*.git*" "*.md" "tests/*" "*.tf*" "iac/**" "stream_handler.py"
+          cd ../..
+          echo "✓ DynamoDB SQS Lambda package built at: ./iac/terraform/lambda_function.zip"
+          ls -lh ./iac/terraform/lambda_function.zip
+          # Build stream Lambda package (stream_handler.py)
+          cd src/lambda-python-dynamodb-sqs-lambda
+          zip -r ../../iac/terraform/stream_lambda.zip stream_handler.py requirements.txt -x "*.git*" "*.md" "tests/*" "*.tf*" "iac/**" "lambda_handler.py"
+          cd ../..
+          echo "✓ Stream Lambda package built at: ./iac/terraform/stream_lambda.zip"
+          ls -lh ./iac/terraform/stream_lambda.zip
 
       # Terraform Deploy Steps
       - name: Setup Terraform
@@ -236,15 +257,24 @@ jobs:
           }
           EOF
           fi
-      - name: Verify Lambda package exists
+      - name: Verify Lambda packages exist
         run: |
-          TERRAFORM_LAMBDA_PATH="./iac/terraform/lambda_function.zip"
-          if [ ! -f "$TERRAFORM_LAMBDA_PATH" ]; then
-            echo "Error: Lambda package not found at: $TERRAFORM_LAMBDA_PATH"
+          # Verify main Lambda package
+          LAMBDA_PACKAGE="./iac/terraform/lambda_function.zip"
+          if [ ! -f "$LAMBDA_PACKAGE" ]; then
+            echo "Error: Lambda package not found at: $LAMBDA_PACKAGE"
             exit 1
           fi
-          echo "✓ Lambda package verified at: $TERRAFORM_LAMBDA_PATH"
-          ls -lh "$TERRAFORM_LAMBDA_PATH"
+          echo "✓ Lambda package verified at: $LAMBDA_PACKAGE"
+          ls -lh "$LAMBDA_PACKAGE"
+          # Verify stream Lambda package
+          STREAM_PACKAGE="./iac/terraform/stream_lambda.zip"
+          if [ ! -f "$STREAM_PACKAGE" ]; then
+            echo "Error: Stream Lambda package not found at: $STREAM_PACKAGE"
+            exit 1
+          fi
+          echo "✓ Stream Lambda package verified at: $STREAM_PACKAGE"
+          ls -lh "$STREAM_PACKAGE"
       - name: Terraform Init
         working-directory: iac/terraform
         run: terraform init

@@ -49,12 +49,6 @@
     "@atlassian-mcp-server/getVisibleJiraProjects",
     "@atlassian-mcp-server/getJiraProjectIssueTypesMetadata",
     "@atlassian-mcp-server/getJiraIssueTypeMetaWithFields",
-    "@atlassian-mcp-server/getCompassComponents",
-    "@atlassian-mcp-server/getCompassComponent",
-    "@atlassian-mcp-server/getCompassCustomFieldDefinitions",
-    "@atlassian-mcp-server/createCompassCustomFieldDefinition",
-    "@atlassian-mcp-server/createCompassComponent",
-    "@atlassian-mcp-server/createCompassComponentRelationship",
     "@atlassian-mcp-server/search",
     "@atlassian-mcp-server/fetch"
   ],

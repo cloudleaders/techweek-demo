@@ -1,50 +1,59 @@
 # Security and Quality Fixes Applied
 
-## Terraform Infrastructure Fixes
+## AWS-16 Code Review Fixes Applied
 
-### 1. Lambda Function Source Code Hash
-- **Issue**: Missing source_code_hash attribute
-- **Fix**: Added `source_code_hash = filebase64sha256("lambda_function.zip")`
-- **Impact**: Enables automatic Lambda updates when deployment package changes
+### High Priority Fixes ✅
 
-### 2. S3 Public Access Block
-- **Issue**: Missing public access protection
-- **Fix**: Added `aws_s3_bucket_public_access_block` resource with all protections enabled
-- **Impact**: Prevents accidental public exposure of S3 bucket
+1. **SQS Dead Letter Queue Configuration**
+   - Added redrive policy with maxReceiveCount: 3
+   - Configured automatic message routing to DLQ after failures
 
-### 3. IAM Policy Least Privilege
-- **Issue**: Overly broad CloudWatch logs resource ARN
-- **Fix**: Restricted to specific log group pattern
-- **Impact**: Follows least privilege security principle
+2. **Lambda Deployment Package Management**
+   - Replaced hardcoded zip file references with Terraform data sources
+   - Added proper source code hash calculation for deployment detection
 
-## Python Lambda Function Fixes
+3. **Hardcoded SQS URL Security Risk**
+   - Moved SQS URL to environment variables
+   - Added validation for required environment variables
 
-### 1. Individual Record Error Handling
-- **Issue**: One failed record could stop processing of all records
-- **Fix**: Added try-catch around individual record processing
-- **Impact**: Improved resilience and fault tolerance
+### Medium Priority Fixes ✅
 
-### 2. Secure Error Responses
-- **Issue**: Internal error details exposed in response body
-- **Fix**: Removed error message from response, kept in logs only
-- **Impact**: Prevents information disclosure to potential attackers
+4. **DynamoDB Encryption at Rest**
+   - Enabled server-side encryption for DynamoDB table
+   - Uses AWS managed encryption keys
 
-### 3. Improved Logging
-- **Issue**: Logging entire event object could expose sensitive data
-- **Fix**: Log only record count instead of full event
-- **Impact**: Reduces risk of sensitive data exposure in logs
+5. **Error Handling Improvements**
+   - Enhanced partial failure handling in both Lambda functions
+   - Added failed record tracking and reporting
+   - Implemented proper batch failure behavior for DynamoDB streams
 
-### 4. Consolidated Logging
-- **Issue**: Multiple separate log statements
-- **Fix**: Combined into single structured log entry
-- **Impact**: Better performance and readability
+6. **Data Sanitization**
+   - Added sensitive data filtering in log output
+   - Redacts password, secret, token, key fields
+   - Prevents sensitive information exposure in CloudWatch logs
 
-### 5. Enhanced Exception Context
-- **Issue**: Generic exception re-raising without context
-- **Fix**: Added bucket and object details to exception chain
-- **Impact**: Better debugging and troubleshooting
+7. **DynamoDB Type Support**
+   - Extended attribute type handling beyond String/Number
+   - Added support for Boolean, List, Map, Sets, Binary types
+   - Improved data representation in logs
 
-## Files Updated
-- `iac/terraform/s3-lambda-trigger-main.tf`
-- `src/lambda-python-s3-lambda-trigger/lambda_handler.py`
-- `iac/terraform/lambda_function.zip` (rebuilt)
+8. **Performance Optimization**
+   - Moved SQS client creation to function scope
+   - Improved connection handling for high-concurrency scenarios
+
+### Excluded Fixes
+
+- **DynamoDB Point-in-Time Recovery**: Skipped per user request (not needed for demo)
+
+## Files Modified
+- `iac/terraform/dynamodb-sqs-lambda-main.tf`
+- `iac/terraform/dynamodb-sqs-lambda-data.tf` (new)
+- `src/lambda-python-dynamodb-sqs-lambda/lambda_handler.py`
+- `src/lambda-python-dynamodb-sqs-lambda/stream_handler.py`
+
+## Security Improvements
+- ✅ Encryption at rest enabled
+- ✅ Environment variable configuration
+- ✅ Sensitive data sanitization
+- ✅ Proper error handling and retry mechanisms
+- ✅ Dead letter queue configuration
