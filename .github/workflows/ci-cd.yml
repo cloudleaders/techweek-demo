@@ -93,6 +93,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Debug OIDC token
+        run: |
+          echo "Repository: ${{ github.repository }}"
+          echo "Ref: ${{ github.ref }}"
+          echo "Actor: ${{ github.actor }}"
+          echo "Expected subject: repo:${{ github.repository }}:ref:${{ github.ref }}"
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
         with:
@@ -225,10 +231,10 @@ jobs:
           mkdir -p ./iac/terraform
           # Build main Lambda package (lambda_handler.py)
           cd src/lambda-python-dynamodb-sqs-lambda
-          zip -r ../../iac/terraform/lambda_function.zip lambda_handler.py requirements.txt -x "*.git*" "*.md" "tests/*" "*.tf*" "iac/**" "stream_handler.py"
+          zip -r ../../iac/terraform/dynamodb_lambda.zip lambda_handler.py requirements.txt -x "*.git*" "*.md" "tests/*" "*.tf*" "iac/**" "stream_handler.py"
           cd ../..
-          echo "✓ DynamoDB SQS Lambda package built at: ./iac/terraform/lambda_function.zip"
-          ls -lh ./iac/terraform/lambda_function.zip
+          echo "✓ DynamoDB Lambda package built at: ./iac/terraform/dynamodb_lambda.zip"
+          ls -lh ./iac/terraform/dynamodb_lambda.zip
           # Build stream Lambda package (stream_handler.py)
           cd src/lambda-python-dynamodb-sqs-lambda
           zip -r ../../iac/terraform/stream_lambda.zip stream_handler.py requirements.txt -x "*.git*" "*.md" "tests/*" "*.tf*" "iac/**" "lambda_handler.py"
@@ -260,14 +266,22 @@ jobs:
           fi
       - name: Verify Lambda packages exist
         run: |
-          # Verify main Lambda package
-          LAMBDA_PACKAGE="./iac/terraform/lambda_function.zip"
-          if [ ! -f "$LAMBDA_PACKAGE" ]; then
-            echo "Error: Lambda package not found at: $LAMBDA_PACKAGE"
+          # Verify S3 Lambda package
+          S3_PACKAGE="./iac/terraform/lambda_function.zip"
+          if [ ! -f "$S3_PACKAGE" ]; then
+            echo "Error: S3 Lambda package not found at: $S3_PACKAGE"
             exit 1
           fi
-          echo "✓ Lambda package verified at: $LAMBDA_PACKAGE"
-          ls -lh "$LAMBDA_PACKAGE"
+          echo "✓ S3 Lambda package verified at: $S3_PACKAGE"
+          ls -lh "$S3_PACKAGE"
+          # Verify DynamoDB Lambda package
+          DYNAMODB_PACKAGE="./iac/terraform/dynamodb_lambda.zip"
+          if [ ! -f "$DYNAMODB_PACKAGE" ]; then
+            echo "Error: DynamoDB Lambda package not found at: $DYNAMODB_PACKAGE"
+            exit 1
+          fi
+          echo "✓ DynamoDB Lambda package verified at: $DYNAMODB_PACKAGE"
+          ls -lh "$DYNAMODB_PACKAGE"
           # Verify stream Lambda package
           STREAM_PACKAGE="./iac/terraform/stream_lambda.zip"
           if [ ! -f "$STREAM_PACKAGE" ]; then
