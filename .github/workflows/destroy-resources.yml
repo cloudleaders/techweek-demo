@@ -31,6 +31,24 @@ jobs:
       working-directory: iac/terraform
       run: terraform init
     
+    - name: Import existing resources
+      working-directory: iac/terraform
+      run: |
+        # Import AWS-14 resources (adjust names as needed)
+        terraform import aws_s3_bucket.upload_bucket techweek-demo-dev-upload-bucket || true
+        terraform import aws_lambda_function.s3_processor techweek-demo-dev-s3-processor || true
+        terraform import aws_iam_role.lambda_execution_role techweek-demo-dev-lambda-role || true
+        terraform import aws_cloudwatch_log_group.lambda_logs /aws/lambda/techweek-demo-dev-s3-processor || true
+        
+        # Import AWS-16 resources (adjust names as needed)
+        terraform import aws_dynamodb_table.users techweek-demo-users || true
+        terraform import aws_sqs_queue.dynamodb_changes techweek-demo-dynamodb-changes || true
+        terraform import aws_sqs_queue.dynamodb_changes_dlq techweek-demo-dynamodb-changes-dlq || true
+        terraform import aws_lambda_function.processor techweek-demo-processor || true
+        terraform import aws_lambda_function.stream_processor techweek-demo-stream-processor || true
+        
+        echo "Import completed (errors ignored)"
+    
     - name: Terraform Destroy
       working-directory: iac/terraform
       run: terraform destroy -auto-approve
