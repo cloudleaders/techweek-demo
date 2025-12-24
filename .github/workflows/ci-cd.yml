@@ -242,6 +242,7 @@ jobs:
           echo "✓ Stream Lambda package built at: ./iac/terraform/stream_lambda.zip"
           ls -lh ./iac/terraform/stream_lambda.zip
 
+
       # Terraform Deploy Steps
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3

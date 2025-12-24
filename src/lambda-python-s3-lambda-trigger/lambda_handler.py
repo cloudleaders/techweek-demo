@@ -28,7 +28,7 @@ def lambda_handler(event: Dict[str, Any], context: Any) -> Dict[str, Any]:
             try:
                 process_s3_record(record)
             except Exception as record_error:
-                logger.error(f"Failed to process record: {str(record_error)}")
+                logger.error(f"Error processing record: {str(record_error)}")
                 # Continue processing other records
         
         return {
