@@ -4,7 +4,7 @@
 
 terraform {
   cloud {
-    organization = "aws-devops-demo"
+    organization = "aws-devops-ai"
     workspaces {
       name = "aws-cloudleader-demo"
     }
