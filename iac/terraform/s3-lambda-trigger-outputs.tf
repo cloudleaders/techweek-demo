@@ -11,13 +11,13 @@ output "s3_bucket_arn" {
   value       = aws_s3_bucket.upload_bucket.arn
 }
 
-output "lambda_function_name" {
-  description = "Name of the Lambda function"
+output "s3_lambda_function_name" {
+  description = "Name of the S3 Lambda function"
   value       = aws_lambda_function.s3_processor.function_name
 }
 
-output "lambda_function_arn" {
-  description = "ARN of the Lambda function"
+output "s3_lambda_function_arn" {
+  description = "ARN of the S3 Lambda function"
   value       = aws_lambda_function.s3_processor.arn
 }
 

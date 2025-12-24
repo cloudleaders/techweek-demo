@@ -74,8 +74,8 @@ resource "aws_iam_role" "lambda_execution_role" {
 }
 
 # IAM policy for Lambda to access S3 and CloudWatch
-resource "aws_iam_role_policy" "lambda_policy" {
-  name = "${var.project_name}-${var.environment}-lambda-policy"
+resource "aws_iam_role_policy" "s3_lambda_policy" {
+  name = "${var.project_name}-${var.environment}-s3-lambda-policy"
   role = aws_iam_role.lambda_execution_role.id
 
   policy = jsonencode({
@@ -126,7 +126,7 @@ resource "aws_lambda_function" "s3_processor" {
   source_code_hash = filebase64sha256("lambda_function.zip")
 
   depends_on = [
-    aws_iam_role_policy.lambda_policy,
+    aws_iam_role_policy.s3_lambda_policy,
     aws_cloudwatch_log_group.lambda_logs,
   ]
 
