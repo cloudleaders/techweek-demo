@@ -1,0 +1,39 @@
+name: Destroy AWS Resources
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm_destroy:
+        description: 'Type "DESTROY" to confirm resource destruction'
+        required: true
+        type: string
+
+jobs:
+  destroy:
+    runs-on: ubuntu-latest
+    if: github.event.inputs.confirm_destroy == 'DESTROY'
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v3
+      with:
+        terraform_version: ~1.1
+    
+    - name: Configure AWS credentials
+      uses: aws-actions/configure-aws-credentials@v4
+      with:
+        role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
+        aws-region: ${{ vars.AWS_REGION }}
+    
+    - name: Terraform Init
+      working-directory: iac/terraform
+      run: terraform init
+    
+    - name: Terraform Destroy
+      working-directory: iac/terraform
+      run: terraform destroy -auto-approve
+      
+    - name: Confirm Destruction
+      run: echo "✅ All AWS-14 and AWS-16 resources destroyed"
