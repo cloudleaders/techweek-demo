@@ -19,6 +19,10 @@ provider "aws" {
 resource "aws_s3_bucket" "upload_bucket" {
   bucket = "${var.project_name}-${var.environment}-upload-bucket"
 
+  lifecycle {
+    ignore_changes = [bucket]
+  }
+
   tags = {
     Name        = "${var.project_name}-upload-bucket"
     Environment = var.environment
@@ -65,6 +69,10 @@ resource "aws_iam_role" "lambda_execution_role" {
     ]
   })
 
+  lifecycle {
+    ignore_changes = [name]
+  }
+
   tags = {
     Name        = "${var.project_name}-lambda-role"
     Environment = var.environment
@@ -106,6 +114,10 @@ resource "aws_iam_role_policy" "s3_lambda_policy" {
 resource "aws_cloudwatch_log_group" "lambda_logs" {
   name              = "/aws/lambda/${var.project_name}-${var.environment}-s3-processor"
   retention_in_days = 7
+
+  lifecycle {
+    ignore_changes = [name]
+  }
 
   tags = {
     Name        = "${var.project_name}-lambda-logs"

@@ -18,6 +18,10 @@ resource "aws_iam_role" "lambda_role" {
     ]
   })
 
+  lifecycle {
+    ignore_changes = [name]
+  }
+
   tags = {
     JiraId    = "AWS-16"
     ManagedBy = "techweek-demo"
@@ -77,6 +81,10 @@ resource "aws_iam_role" "stream_lambda_role" {
       }
     ]
   })
+
+  lifecycle {
+    ignore_changes = [name]
+  }
 
   tags = {
     JiraId    = "AWS-16"

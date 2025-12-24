@@ -18,6 +18,10 @@ resource "aws_dynamodb_table" "users" {
     enabled = true
   }
 
+  lifecycle {
+    ignore_changes = [name]
+  }
+
   tags = {
     JiraId    = "AWS-16"
     ManagedBy = "techweek-demo"
