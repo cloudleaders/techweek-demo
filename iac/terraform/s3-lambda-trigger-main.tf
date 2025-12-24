@@ -21,6 +21,8 @@ resource "aws_s3_bucket" "upload_bucket" {
 
   lifecycle {
     ignore_changes = [bucket]
+    # Prevent destruction of existing resources
+    prevent_destroy = false
   }
 
   tags = {
