@@ -8,6 +8,10 @@ on:
         required: true
         type: string
 
+permissions:
+  id-token: write
+  contents: read
+
 jobs:
   destroy:
     runs-on: ubuntu-latest
@@ -16,42 +20,69 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     
-    - name: Setup Terraform
-      uses: hashicorp/setup-terraform@v3
-      with:
-        terraform_version: ~1.6
-    
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v4
       with:
         role-to-assume: ${{ secrets.AWS_ROLE_TO_ASSUME }}
         aws-region: ${{ vars.AWS_REGION }}
     
-    - name: Terraform Init
-      working-directory: iac/terraform
-      run: terraform init
-    
-    - name: Import existing resources
-      working-directory: iac/terraform
+    - name: Destroy AWS-14 Resources (S3-Lambda)
       run: |
-        # Import AWS-14 resources (adjust names as needed)
-        terraform import aws_s3_bucket.upload_bucket techweek-demo-dev-upload-bucket || true
-        terraform import aws_lambda_function.s3_processor techweek-demo-dev-s3-processor || true
-        terraform import aws_iam_role.lambda_execution_role techweek-demo-dev-lambda-role || true
-        terraform import aws_cloudwatch_log_group.lambda_logs /aws/lambda/techweek-demo-dev-s3-processor || true
+        echo "🗑️ Destroying AWS-14 resources..."
         
-        # Import AWS-16 resources (adjust names as needed)
-        terraform import aws_dynamodb_table.users techweek-demo-users || true
-        terraform import aws_sqs_queue.dynamodb_changes techweek-demo-dynamodb-changes || true
-        terraform import aws_sqs_queue.dynamodb_changes_dlq techweek-demo-dynamodb-changes-dlq || true
-        terraform import aws_lambda_function.processor techweek-demo-processor || true
-        terraform import aws_lambda_function.stream_processor techweek-demo-stream-processor || true
+        # Remove S3 bucket notification first
+        aws s3api put-bucket-notification-configuration --bucket techweek-demo-dev-upload-bucket --notification-configuration '{}' || true
         
-        echo "Import completed (errors ignored)"
+        # Delete Lambda permission
+        aws lambda remove-permission --function-name techweek-demo-dev-s3-processor --statement-id AllowExecutionFromS3Bucket || true
+        
+        # Delete Lambda function
+        aws lambda delete-function --function-name techweek-demo-dev-s3-processor || true
+        
+        # Empty and delete S3 bucket
+        aws s3 rm s3://techweek-demo-dev-upload-bucket --recursive || true
+        aws s3api delete-bucket --bucket techweek-demo-dev-upload-bucket || true
+        
+        # Delete CloudWatch log group
+        aws logs delete-log-group --log-group-name /aws/lambda/techweek-demo-dev-s3-processor || true
+        
+        # Delete IAM role policy
+        aws iam delete-role-policy --role-name techweek-demo-dev-lambda-role --policy-name techweek-demo-dev-s3-lambda-policy || true
+        
+        # Delete IAM role
+        aws iam delete-role --role-name techweek-demo-dev-lambda-role || true
+        
+        echo "✅ AWS-14 resources destroyed"
     
-    - name: Terraform Destroy
-      working-directory: iac/terraform
-      run: terraform destroy -auto-approve
+    - name: Destroy AWS-16 Resources (DynamoDB-SQS-Lambda)
+      run: |
+        echo "🗑️ Destroying AWS-16 resources..."
+        
+        # Delete Lambda event source mappings
+        aws lambda list-event-source-mappings --function-name techweek-demo-processor --query 'EventSourceMappings[].UUID' --output text | xargs -I {} aws lambda delete-event-source-mapping --uuid {} || true
+        aws lambda list-event-source-mappings --function-name techweek-demo-stream-processor --query 'EventSourceMappings[].UUID' --output text | xargs -I {} aws lambda delete-event-source-mapping --uuid {} || true
+        
+        # Delete Lambda functions
+        aws lambda delete-function --function-name techweek-demo-processor || true
+        aws lambda delete-function --function-name techweek-demo-stream-processor || true
+        
+        # Delete SQS queues
+        aws sqs delete-queue --queue-url $(aws sqs get-queue-url --queue-name techweek-demo-dynamodb-changes --query 'QueueUrl' --output text) || true
+        aws sqs delete-queue --queue-url $(aws sqs get-queue-url --queue-name techweek-demo-dynamodb-changes-dlq --query 'QueueUrl' --output text) || true
+        
+        # Delete DynamoDB table
+        aws dynamodb delete-table --table-name techweek-demo-users || true
+        
+        # Delete IAM roles and policies
+        aws iam delete-role-policy --role-name techweek-demo-lambda-role --policy-name techweek-demo-lambda-policy || true
+        aws iam delete-role-policy --role-name techweek-demo-stream-lambda-role --policy-name techweek-demo-stream-lambda-policy || true
+        aws iam delete-role --role-name techweek-demo-lambda-role || true
+        aws iam delete-role --role-name techweek-demo-stream-lambda-role || true
+        
+        echo "✅ AWS-16 resources destroyed"
       
-    - name: Confirm Destruction
-      run: echo "✅ All AWS-14 and AWS-16 resources destroyed"
+    - name: Confirm Complete Destruction
+      run: |
+        echo "🎉 All AWS-14 and AWS-16 resources have been destroyed!"
+        echo "💰 AWS charges should stop within minutes"
+        echo "🔍 Verify in AWS Console that all resources are gone"
