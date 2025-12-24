@@ -86,3 +86,53 @@ jobs:
         echo "🎉 All AWS-14 and AWS-16 resources have been destroyed!"
         echo "💰 AWS charges should stop within minutes"
         echo "🔍 Verify in AWS Console that all resources are gone"
+    
+    - name: Force Delete Remaining Resources
+      run: |
+        echo "🔧 Force deleting any remaining resources..."
+        
+        # Force delete specific Lambda function
+        aws lambda delete-function --function-name techweek-demo-dev-s3-processor || true
+        
+        # Force delete S3 bucket with versioning disabled first
+        aws s3api put-bucket-versioning --bucket techweek-demo-dev-upload-bucket --versioning-configuration Status=Suspended || true
+        aws s3api delete-bucket-policy --bucket techweek-demo-dev-upload-bucket || true
+        aws s3 rm s3://techweek-demo-dev-upload-bucket --recursive --include "*" || true
+        aws s3api list-object-versions --bucket techweek-demo-dev-upload-bucket --query 'Versions[].{Key:Key,VersionId:VersionId}' --output text | while read key version; do aws s3api delete-object --bucket techweek-demo-dev-upload-bucket --key "$key" --version-id "$version" || true; done
+        aws s3api list-object-versions --bucket techweek-demo-dev-upload-bucket --query 'DeleteMarkers[].{Key:Key,VersionId:VersionId}' --output text | while read key version; do aws s3api delete-object --bucket techweek-demo-dev-upload-bucket --key "$key" --version-id "$version" || true; done
+        aws s3api delete-bucket --bucket techweek-demo-dev-upload-bucket || true
+        
+        # Force delete SQS queue
+        SQS_URL=$(aws sqs get-queue-url --queue-name techweek-demo-dynamodb-changes --query 'QueueUrl' --output text 2>/dev/null || echo "")
+        if [ ! -z "$SQS_URL" ]; then
+          aws sqs delete-queue --queue-url "$SQS_URL" || true
+        fi
+        
+        # Force delete DynamoDB table
+        aws dynamodb delete-table --table-name techweek-demo-users || true
+        
+        # Wait for DynamoDB table deletion
+        echo "⏳ Waiting for DynamoDB table deletion..."
+        aws dynamodb wait table-not-exists --table-name techweek-demo-users || true
+        
+        # Force delete all associated IAM roles and policies
+        echo "🗑️ Force deleting IAM roles and policies..."
+        
+        # Delete policies from roles first
+        aws iam delete-role-policy --role-name techweek-demo-dev-lambda-role --policy-name techweek-demo-dev-s3-lambda-policy || true
+        aws iam delete-role-policy --role-name techweek-demo-lambda-role --policy-name techweek-demo-lambda-policy || true
+        aws iam delete-role-policy --role-name techweek-demo-stream-lambda-role --policy-name techweek-demo-stream-lambda-policy || true
+        
+        # Delete the roles
+        aws iam delete-role --role-name techweek-demo-dev-lambda-role || true
+        aws iam delete-role --role-name techweek-demo-lambda-role || true
+        aws iam delete-role --role-name techweek-demo-stream-lambda-role || true
+        
+        # Verify deletion
+        echo "🔍 Verifying deletion..."
+        aws lambda get-function --function-name techweek-demo-dev-s3-processor && echo "❌ Lambda still exists" || echo "✅ Lambda deleted"
+        aws s3api head-bucket --bucket techweek-demo-dev-upload-bucket && echo "❌ S3 bucket still exists" || echo "✅ S3 bucket deleted"
+        aws sqs get-queue-url --queue-name techweek-demo-dynamodb-changes && echo "❌ SQS queue still exists" || echo "✅ SQS queue deleted"
+        aws dynamodb describe-table --table-name techweek-demo-users && echo "❌ DynamoDB table still exists" || echo "✅ DynamoDB table deleted"
+        
+        echo "🏁 Force cleanup completed"
